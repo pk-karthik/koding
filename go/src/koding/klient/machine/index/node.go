@@ -39,7 +39,7 @@ func newEntry() *Entry {
 }
 
 func (nd *Node) Add(name string, entry *Entry) {
-	if name == "/" {
+	if name == "/" || name == "" {
 		nd.Entry = entry
 		return
 	}
@@ -47,6 +47,10 @@ func (nd *Node) Add(name string, entry *Entry) {
 	var node string
 
 	for {
+		if nd.deleted() {
+			nd.undelete()
+		}
+
 		node, name = split(name)
 
 		node, path = split(path)
@@ -70,6 +74,10 @@ func (nd *Node) Del(name string) {
 	var node string
 
 	for {
+		if nd.deleted() {
+			return
+		}
+
 		node, name = split(name)
 
 		node, path = split(path)
@@ -160,7 +168,7 @@ func (nd *Node) Count(maxsize int64) (count int) {
 	for len(stack) != 0 {
 		cur, stack = stack[0], stack[1:]
 
-		if cur.Deleted() {
+		if cur.deleted() {
 			continue
 		}
 
@@ -193,7 +201,7 @@ func (nd *Node) DiskSize(maxsize int64) (size int64) {
 	for len(stack) != 0 {
 		nd, stack = stack[0], stack[1:]
 
-		if nd.Deleted() {
+		if nd.deleted() {
 			continue
 		}
 
@@ -230,7 +238,7 @@ func (nd *Node) ForEach(fn func(string, *Entry)) {
 	for len(stack) != 0 {
 		n, stack = stack[0], stack[1:]
 
-		if n.node.Deleted() {
+		if n.node.deleted() {
 			continue
 		}
 
@@ -246,6 +254,10 @@ func (nd *Node) ForEach(fn func(string, *Entry)) {
 }
 
 func (nd *Node) Lookup(name string) (*Node, bool) {
+	return nd.lookup(name, false)
+}
+
+func (nd *Node) lookup(name string, all bool) (*Node, bool) {
 	if name == "/" || name == "" {
 		return nd, true
 	}
@@ -253,6 +265,10 @@ func (nd *Node) Lookup(name string) (*Node, bool) {
 	var node string
 
 	for {
+		if nd.deleted() {
+			return nil, false
+		}
+
 		node, name = split(name)
 
 		node, path = split(path)
@@ -268,6 +284,14 @@ func (nd *Node) Lookup(name string) (*Node, bool) {
 
 		nd = sub
 	}
+}
+
+func (nd *Node) deleted() bool {
+	return nd.Entry.Meta&EntryPromiseDel != 0
+}
+
+func (nd *Node) undelete() {
+	nd.Entry.Meta = nd.Entry.Meta & (^EntryPromiseDel)
 }
 
 func split(path string) (string, string) {
