@@ -184,6 +184,10 @@ func (fs *Filesystem) Config() *fuse.MountConfig {
 	}
 }
 
+func (fs *Filesystem) DebugString() string {
+	return fs.Remote.DebugString()
+}
+
 func (fs *Filesystem) add(path string) (id fuseops.InodeID) {
 	for {
 		fs.seq++
