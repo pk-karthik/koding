@@ -17,12 +17,6 @@ import (
 	"github.com/djherbis/times"
 )
 
-// TODO:
-//
-// - PromiseAdd / PromiseDel
-// - copy Sub on Lookup
-//
-
 // Version stores current version of index.
 const Version = 1
 
