@@ -34,6 +34,10 @@ module.exports = setupIntercom = ->
       x = d.getElementsByTagName('script')[0]
       x.parentNode.insertBefore s, x
 
+      someCountries = ['vi', 'fa', 'ur', 'tn']
+      lang = navigator.language or navigator.userLanguage
+      isSpam = lang.indexOf('ar-') > -1 or lang in someCountries
+
       account = whoami()
       account.fetchEmail (err, email) ->
         window.Intercom 'boot',
@@ -41,3 +45,4 @@ module.exports = setupIntercom = ->
           name    : getFullnameFromAccount account
           email   : email
           user_id : account._id
+          hide_default_launcher : isSpam
