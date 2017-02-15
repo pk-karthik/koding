@@ -1,4 +1,0 @@
-init_config:
-
-instances:
-    - collect_connection_state: true
