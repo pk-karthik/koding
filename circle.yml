@@ -132,3 +132,11 @@ stages:
         command: ./run exec scripts/gotests.sh kites \
           koding/kites/kloud/provider/... koding/kites/kloud/credential/... \
           koding/kites/kloud/stack/... koding/kites/kloud/kloud/...
+
+      - type: shell
+        name: check social API code quality
+        command: scripts/check_socialapi_code_quality.sh
+
+      - type: shell
+        name: prepare social API test data
+        command: ./run exec go run go/src/socialapi/workers/cmd/migrator/main.go -c go/src/socialapi/config/default.toml
